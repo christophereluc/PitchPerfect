@@ -24,10 +24,15 @@ class PlaySoundsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        audioPlayer = AVAudioPlayer(contentsOfURL: receivedAudio.filePathUrl, error: nil)
+        do {
+            try audioPlayer = AVAudioPlayer(contentsOfURL: receivedAudio.filePathUrl)
         audioPlayer.enableRate = true
         audioEngine = AVAudioEngine()
-        audioFile = AVAudioFile(forReading: receivedAudio.filePathUrl, error: nil)
+            try audioFile = AVAudioFile(forReading: receivedAudio.filePathUrl)
+        }
+        catch {
+            print("Error loading audio player or file")
+        }
     }
 
     @IBAction func playFastSound(sender: UIButton) {
@@ -64,7 +69,13 @@ class PlaySoundsViewController: UIViewController {
         audioEngine.connect(changePitchEffect, to: audioEngine.outputNode, format: nil)
         
         audioPlayerNode.scheduleFile(audioFile, atTime: nil, completionHandler: nil)
-        audioEngine.startAndReturnError(nil)
+        do {
+            try audioEngine.start()
+        }
+        catch {
+            print("Error starting up engine")
+            return
+        }
         
         audioPlayerNode.play()
     }
